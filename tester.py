@@ -23,7 +23,6 @@ class ServoStatus(enum.Enum):
 class ServoController():
 	def __init__(self, pin, maxAngle):
 		self.pin = pin
-		#self.angle = maxAngle
 		self.maxAngle = maxAngle
 		self.stopped = False
 		self.status = ServoStatus.neutral
@@ -75,6 +74,7 @@ class ServoController():
 				print("Servo is auto")
 				
 	def stop(self):
+		self.board.exit()
 		self.stopped = True
 		
 	def setServoNeutral(self):
@@ -137,6 +137,7 @@ def main():
 	app.exec()
 	
 	servo.setServoNeutral()
+	servo.stop()
 
 if __name__ == "__main__":
 	main()
