@@ -11,9 +11,9 @@ import math
 import time
 import argparse
 from threading import Thread
-from PyQt5 import QtWidgets, uic
+from pyfirmata2 import Arduino, SERVO
 from PyQt5.QtSerialPort import QSerialPortInfo
-from pyfirmata import Arduino, SERVO
+from PyQt5 import QtWidgets, uic
 
 class ServoStatus(enum.Enum):
 	manual = 0
@@ -28,10 +28,6 @@ class ServoController():
 		self.status = ServoStatus.neutral
 		
 	def start(self):
-		#port = 'COM3'# Windows
-		#port = '/dev/ttyACM3' # Linux
-		#port = '/dev/tty.usbmodem11401'# Mac
-		
 		ports = QSerialPortInfo().availablePorts()
 		for port in ports:
 			if "tty.usbmodem" in port.portName() and "Arduino" in port.manufacturer():
@@ -50,19 +46,16 @@ class ServoController():
 	def update(self):
 		increment = True
 		
-		while True:
-			if self.stopped:
-				return
-			
-			time.sleep(.1)
-			
+		while not self.stopped:
+			time.sleep(.05)
+
 			if self.status == ServoStatus.auto:
 				if increment:
 					self.angle += 1
 				else:
 					self.angle -= 1
 				
-				time.sleep(.001)
+				time.sleep(.01)
 				
 				if self.angle >= 180: 
 					increment = False
@@ -72,7 +65,7 @@ class ServoController():
 				self.setServoPosition(self.angle)
 				
 				print("Servo is auto")
-				
+
 	def stop(self):
 		self.board.exit()
 		self.stopped = True
